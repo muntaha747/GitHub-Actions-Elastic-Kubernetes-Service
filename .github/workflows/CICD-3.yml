@@ -27,7 +27,7 @@ jobs:
       - name: Install Maven
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y
+          sudo apt-get install maven -y
 
       - name: Compile Maven Project
         run: mvn clean compile
