@@ -1,63 +1,63 @@
-name: Maven Build and Trivy Scan
+# name: Maven Build and Trivy Scan (This GitHub Actions file is build in One Job)
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  build-and-security-scan:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-and-security-scan:
+#     runs-on: ubuntu-latest
 
-    steps:
-      ####################################################
-      # Checkout Source Code
-      ####################################################
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
+#     steps:
+#       ####################################################
+#       # Checkout Source Code
+#       ####################################################
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
 
-      ####################################################
-      # Install Java
-      ####################################################
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+#       ####################################################
+#       # Install Java
+#       ####################################################
+#       - name: Setup Java 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
 
-      ####################################################
-      # Compile Project
-      ####################################################
-      - name: Compile Maven Project
-        run: mvn clean compile
+#       ####################################################
+#       # Compile Project
+#       ####################################################
+#       - name: Compile Maven Project
+#         run: mvn clean compile
 
-      ####################################################
-      # Download Maven Dependencies
-      ####################################################
-      - name: Resolve Maven Dependencies
-        run: mvn dependency:resolve
+#       ####################################################
+#       # Download Maven Dependencies
+#       ####################################################
+#       - name: Resolve Maven Dependencies
+#         run: mvn dependency:resolve
 
-      ####################################################
-      # Install Trivy
-      ####################################################
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg
+#       ####################################################
+#       # Install Trivy
+#       ####################################################
+#       - name: Install Trivy
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y wget gnupg
 
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
-          gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+#           wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
+#           gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
 
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | \
-          sudo tee /etc/apt/sources.list.d/trivy.list
+#           echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | \
+#           sudo tee /etc/apt/sources.list.d/trivy.list
 
-          sudo apt-get update
-          sudo apt-get install -y trivy
+#           sudo apt-get update
+#           sudo apt-get install -y trivy
 
-      ####################################################
-      # Trivy File System Scan
-      ####################################################
-      - name: Trivy File System Scan
-        run: |
-          trivy fs --format table .
+#       ####################################################
+#       # Trivy File System Scan
+#       ####################################################
+#       - name: Trivy File System Scan
+#         run: |
+#           trivy fs --format table .
