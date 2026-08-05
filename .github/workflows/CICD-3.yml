@@ -1,106 +1,106 @@
-name: Maven Build and Trivy Scan
+# name: Maven Build and Trivy Scan
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  ####################################################
-  # Job 1: Compile
-  ####################################################
-  compile:
-    runs-on: Mac-OS-Runner
+# jobs:
+#   ####################################################
+#   # Job 1: Compile
+#   ####################################################
+#   compile:
+#     runs-on: Mac-OS-Runner
 
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+#       - name: Setup Java 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
 
         
-      - name: Install Maven
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install maven -y
+#       - name: Install Maven
+#         run: |
+#           sudo apt-get update -y
+#           sudo apt-get install maven -y
 
-      - name: Compile Maven Project
-        run: mvn clean compile
+#       - name: Compile Maven Project
+#         run: mvn clean compile
     
-      - name: Resolve Maven Dependencies
-        run: mvn dependency:resolve
+#       - name: Resolve Maven Dependencies
+#         run: mvn dependency:resolve
 
-  ####################################################
-  # Job 2: Build
-  ####################################################
-  build:
-    runs-on: Mac-OS-Runner
-    needs: compile
+#   ####################################################
+#   # Job 2: Build
+#   ####################################################
+#   build:
+#     runs-on: Mac-OS-Runner
+#     needs: compile
 
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+#       - name: Setup Java 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
 
-      - name: Build Maven Project
-        run: mvn clean package
+#       - name: Build Maven Project
+#         run: mvn clean package
 
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg
+#       - name: Install Trivy
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y wget gnupg
 
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
-          gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+#           wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
+#           gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
 
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | \
-          sudo tee /etc/apt/sources.list.d/trivy.list
+#           echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | \
+#           sudo tee /etc/apt/sources.list.d/trivy.list
 
-          sudo apt-get update
-          sudo apt-get install -y trivy
+#           sudo apt-get update
+#           sudo apt-get install -y trivy
 
-      - name: Trivy File System Scan
-        run: |
-          trivy fs --format table .
+#       - name: Trivy File System Scan
+#         run: |
+#           trivy fs --format table .
 
-      - name: Install Gitleaks
-        run: |
-           wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
-           tar -xzf gitleaks_8.21.2_linux_x64.tar.gz gitleaks
-           sudo mv gitleaks /usr/local/bin/
+#       - name: Install Gitleaks
+#         run: |
+#            wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
+#            tar -xzf gitleaks_8.21.2_linux_x64.tar.gz gitleaks
+#            sudo mv gitleaks /usr/local/bin/
 
-      - name: Run Gitleaks Scan
-        run: gitleaks detect --source . --verbose
+#       - name: Run Gitleaks Scan
+#         run: gitleaks detect --source . --verbose
            
 
-  ####################################################
-  # Job 3: Test
-  ####################################################
-  test:
-    runs-on: Mac-OS-Runner
-    needs: build
+#   ####################################################
+#   # Job 3: Test
+#   ####################################################
+#   test:
+#     runs-on: Mac-OS-Runner
+#     needs: build
 
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+#       - name: Set up JDK 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
 
-      - name: Unit Test cases
-        run: mvn test
+#       - name: Unit Test cases
+#         run: mvn test
