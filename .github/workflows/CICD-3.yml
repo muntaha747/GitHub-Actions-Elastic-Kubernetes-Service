@@ -10,7 +10,7 @@ jobs:
   # Job 1: Compile
   ####################################################
   compile:
-    runs-on: self-hosted
+    runs-on: Mac-OS-Runner
 
     steps:
       - name: Checkout Source Code
@@ -39,7 +39,7 @@ jobs:
   # Job 2: Build
   ####################################################
   build:
-    runs-on: self-hosted
+    runs-on: Mac-OS-Runner
     needs: compile
 
     steps:
@@ -88,7 +88,7 @@ jobs:
   # Job 3: Test
   ####################################################
   test:
-    runs-on: self-hosted
+    runs-on: Mac-OS-Runner
     needs: build
 
     steps:
