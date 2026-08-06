@@ -49,9 +49,9 @@ jobs:
       - name: Install Trivy
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.49.0/trivy_0.49.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.49.0_Linux-64bit.deb
+          sudo apt-get install -y snapd
+          sudo snap install trivy
+          trivy --version
       - name: Trivy File System Scan
         run: |
           trivy fs --format table .
