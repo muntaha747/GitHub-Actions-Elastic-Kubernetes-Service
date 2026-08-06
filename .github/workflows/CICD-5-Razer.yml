@@ -111,7 +111,7 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_RAZER}}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL_RAZER }}
 
       - name: SonarQube Quality Gate check
@@ -120,7 +120,7 @@ jobs:
         with:
           pollingTimeoutSec: 600
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_RAZER }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL_RAZER }}
        
   ####################################################
