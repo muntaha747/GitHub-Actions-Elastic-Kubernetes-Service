@@ -130,7 +130,7 @@ jobs:
     runs-on: Razer-Linux-Runner
     needs: build_project_and_sonar_scan
     steps:
-      - name: Download JAR Artifact
+      - name: Download JAR Artifact (Executable Binary)
         uses: actions/download-artifact@v4
         with:
           name: app-jar
@@ -148,5 +148,5 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
-          platforms: linux/arm64
+          platforms: linux/amd64
           tags: muntaha747/bankapp:latest
