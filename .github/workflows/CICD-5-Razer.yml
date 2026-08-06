@@ -10,7 +10,7 @@ jobs:
   # Job 1: Compile
   ####################################################
   compile:
-    runs-on: ubuntu-latest 
+    runs-on: Razer-Linux-Runner 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
   # Job 2: Build
   ####################################################
   build:
-    runs-on: ubuntu-latest 
+    runs-on: Razer-Linux-Runner
     needs: compile
     steps:
       - name: Checkout Source Code
@@ -68,7 +68,7 @@ jobs:
   # Job 3: Test
   ####################################################
   test:
-    runs-on: ubuntu-latest 
+    runs-on: Razer-Linux-Runner 
     needs: build
     steps:
       - name: Checkout Source Code
@@ -86,7 +86,7 @@ jobs:
   # Job 4: Sonarqube testing
   ####################################################
   build_project_and_sonar_scan:
-    runs-on: ubuntu-latest 
+    runs-on: Razer-Linux-Runner
     needs: test
     steps:
       - name: Checkout Source Code
@@ -112,7 +112,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL_RAZER }}
 
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
@@ -121,13 +121,13 @@ jobs:
           pollingTimeoutSec: 600
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL_RAZER }}
        
   ####################################################
   # Job 5: Dockerfile
   ####################################################
   build_Docker_Image_and_Push:
-    runs-on: ubuntu-latest 
+    runs-on: Razer-Linux-Runner
     needs: build_project_and_sonar_scan
     steps:
       - name: Download JAR Artifact
