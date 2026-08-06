@@ -1,149 +1,149 @@
-name: Maven Build and Trivy Scan
+# name: Maven Build and Trivy Scan
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  ####################################################
-  # Job 1: Compile
-  ####################################################
-  compile:
-    runs-on: Razer-Linux-Runner 
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
-      - name: Install Maven
-        run: |
-          brew update
-          brew install maven
-      - name: Compile Maven Project
-        run: mvn clean compile
-      - name: Resolve Maven Dependencies
-        run: mvn dependency:resolve
+# jobs:
+#   ####################################################
+#   # Job 1: Compile
+#   ####################################################
+#   compile:
+#     runs-on: Razer-Linux-Runner 
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
+#       - name: Setup Java 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
+#       - name: Install Maven
+#         run: |
+#           brew update
+#           brew install maven
+#       - name: Compile Maven Project
+#         run: mvn clean compile
+#       - name: Resolve Maven Dependencies
+#         run: mvn dependency:resolve
 
-  ####################################################
-  # Job 2: Build
-  ####################################################
-  build:
-    runs-on: Razer-Linux-Runner 
-    needs: compile
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
-      - name: Build Maven Project
-        run: mvn clean package
-      - name: Install Trivy
-        run: |
-          brew update
-          brew install trivy
-      - name: Trivy File System Scan
-        run: |
-          trivy fs --format table .
-      - name: Install Gitleaks
-        run: |
-          brew update
-          brew install gitleaks
-      - name: Run Gitleaks Scan
-        run: gitleaks detect --source . --verbose
+#   ####################################################
+#   # Job 2: Build
+#   ####################################################
+#   build:
+#     runs-on: Razer-Linux-Runner 
+#     needs: compile
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
+#       - name: Setup Java 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
+#       - name: Build Maven Project
+#         run: mvn clean package
+#       - name: Install Trivy
+#         run: |
+#           brew update
+#           brew install trivy
+#       - name: Trivy File System Scan
+#         run: |
+#           trivy fs --format table .
+#       - name: Install Gitleaks
+#         run: |
+#           brew update
+#           brew install gitleaks
+#       - name: Run Gitleaks Scan
+#         run: gitleaks detect --source . --verbose
 
-  ####################################################
-  # Job 3: Test
-  ####################################################
-  test:
-    runs-on: Razer-Linux-Runner 
-    needs: build
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
-      - name: Unit Test cases
-        run: mvn test
+#   ####################################################
+#   # Job 3: Test
+#   ####################################################
+#   test:
+#     runs-on: Razer-Linux-Runner 
+#     needs: build
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
+#       - name: Set up JDK 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
+#       - name: Unit Test cases
+#         run: mvn test
 
-  ####################################################
-  # Job 4: Sonarqube testing
-  ####################################################
-  build_project_and_sonar_scan:
-    runs-on: Razer-Linux-Runner 
-    needs: test
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
-      - name: Build Project
-        run: mvn package
+#   ####################################################
+#   # Job 4: Sonarqube testing
+#   ####################################################
+#   build_project_and_sonar_scan:
+#     runs-on: Razer-Linux-Runner 
+#     needs: test
+#     steps:
+#       - name: Checkout Source Code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+#       - name: Set up JDK 17
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: '17'
+#           cache: maven
+#       - name: Build Project
+#         run: mvn package
 
-      - name: Upload Executable Binary
-        uses: actions/upload-artifact@v4
-        with:
-            name: app-jar
-            path: target/*.jar
+#       - name: Upload Executable Binary
+#         uses: actions/upload-artifact@v4
+#         with:
+#             name: app-jar
+#             path: target/*.jar
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v8.2.1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+#       - name: SonarQube Scan
+#         uses: SonarSource/sonarqube-scan-action@v8.2.1
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
 
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+#       - name: SonarQube Quality Gate check
+#         id: sonarqube-quality-gate-check
+#         uses: sonarsource/sonarqube-quality-gate-action@master
+#         with:
+#           pollingTimeoutSec: 600
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
        
-####################################################
-  # Job 5: Dockerfile
-  ####################################################
-  build_Docker_Image_and_Push:
-    runs-on: Razer-Linux-Runner 
-    needs: build_project_and_sonar_scan
-    steps:
-      - name: Download JAR Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app-jar
-          path: app
-      - name: Login to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-      - name: Build and push
-        uses: docker/build-push-action@v7
-        with:
-          push: true
-          platforms: linux/amd64, linux/arm64
-          tags: muntaha747/bankapp:latest
+# ####################################################
+#   # Job 5: Dockerfile
+#   ####################################################
+#   build_Docker_Image_and_Push:
+#     runs-on: Razer-Linux-Runner 
+#     needs: build_project_and_sonar_scan
+#     steps:
+#       - name: Download JAR Artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: app-jar
+#           path: app
+#       - name: Login to Docker Hub
+#         uses: docker/login-action@v4
+#         with:
+#           username: ${{ vars.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: Set up QEMU
+#         uses: docker/setup-qemu-action@v4
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v4
+#       - name: Build and push
+#         uses: docker/build-push-action@v7
+#         with:
+#           push: true
+#           platforms: linux/amd64, linux/arm64
+#           tags: muntaha747/bankapp:latest
 
